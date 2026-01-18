@@ -15,5 +15,5 @@ jobs:
             - name: Install Dependencies
               run: npm install
             - name: check style
-              run: npm run elint
+              run: npm run eslint
          
