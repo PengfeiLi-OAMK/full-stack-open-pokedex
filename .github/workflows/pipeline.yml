@@ -8,7 +8,7 @@ on:
         branches:
             - main
 jobs:
-    simple_deplotment_pipeline:
+    simple_deployment_pipeline:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
@@ -26,4 +26,20 @@ jobs:
             - name: Deploy to Production
               if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
               run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
-                  
+    tag_realse:
+        needs: [simple_deployment_pipeline]
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+            - name: Bump version and push tag
+              if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+              uses: anothrNick/github-tag-action@1.75.0
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  DEFAULT_BUMP: patch
+                  DRY_RUN: true
+                
